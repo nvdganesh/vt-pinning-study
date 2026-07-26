@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.vtstudy</groupId>
+  <artifactId>vt-pinning-load</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gatling.version>3.10.5</gatling.version>
+    <gatling.plugin.version>4.10.2</gatling.plugin.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.gatling.highcharts</groupId>
+      <artifactId>gatling-charts-highcharts</artifactId>
+      <version>${gatling.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.gatling</groupId>
+        <artifactId>gatling-maven-plugin</artifactId>
+        <version>${gatling.plugin.version}</version>
+        <configuration>
+          <simulationClass>com.vtstudy.load.PinningSimulation</simulationClass>
+          <!-- run_sweep.sh writes one results directory per run so nothing
+               gets overwritten across the sweep -->
+          <resultsFolder>${project.basedir}/results</resultsFolder>
+          <!-- Plugin's default forked-JVM heap is -Xmx1G, which OOMs at
+               rps=4000+ even against non-pinning endpoints once thousands
+               of concurrent sessions/HDR histogram buckets accumulate. An
+               OOM here does not cleanly exit; the forked JVM can hang
+               instead of crashing, blocking the whole sweep indefinitely.
+               32GB is available on this machine; 4G is generous headroom. -->
+          <jvmArgs>
+            <jvmArg>-Xmx4g</jvmArg>
+            <!-- If it OOMs anyway (e.g. an even higher RPS level), fail
+                 fast instead of hanging the whole sweep for hours. -->
+            <jvmArg>-XX:+ExitOnOutOfMemoryError</jvmArg>
+          </jvmArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

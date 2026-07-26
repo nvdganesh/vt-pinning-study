@@ -1,0 +1,20 @@
+# Heap dumps / profiling
+*.hprof
+
+# Maven build output
+target/
+
+# Python
+__pycache__/
+*.pyc
+
+# Compiled Java classes outside Maven
+*.class
+
+# Scratch dirs
+tmp-smoketest/
+tmp-smoketest-jdk24/
+
+# Raw benchmark results (large JFR/gatling output, kept local only)
+/results/
+/results_trim_validated_*/

@@ -1,0 +1,43 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    # Only required if you exercise /db-query (the optional, secondary,
+    # real-driver experiment). The primary synthetic endpoints
+    # (/cpu-bound, /io-baseline, /io-synchronized-pinned-*, /io-reentrantlock,
+    # /class-init-*) need no database at all and will work with this
+    # datasource absent/unreachable -- Spring will just skip pool init lazily.
+    url: jdbc:postgresql://localhost:5432/vtstudy
+    username: vtstudy
+    password: vtstudy
+    hikari:
+      # Keep this comfortably above your max test concurrency for the
+      # /db-query experiment, or the connection pool itself becomes the
+      # bottleneck instead of virtual-thread pinning -- a confound you do
+      # not want in your results.
+      maximum-pool-size: 200
+
+server:
+  port: 8080
+  tomcat:
+    threads:
+      # With virtual threads enabled, Tomcat's request-handling executor is
+      # replaced; this just keeps the acceptor/poller platform-thread count
+      # sane. Leave at default unless you have a specific reason to change it.
+      max: 200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.vtstudy: INFO

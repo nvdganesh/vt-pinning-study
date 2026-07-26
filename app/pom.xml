@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.0</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.vtstudy</groupId>
+  <artifactId>vt-pinning-app</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!--
+      IMPORTANT: this controls the *compile target*, not the JVM you run it on.
+      Compile once at 21; the resulting jar runs unmodified on JDK 21 and JDK 24.
+      Switch the *runtime* JDK with SDKMAN (see scripts/run_sweep.sh), not this property.
+    -->
+    <java.version>21</java.version>
+
+    <!--
+      Driver version knob for the OPTIONAL secondary/external-validity experiment
+      (real JDBC driver pinning vs. fixed). Primary experiments (controlled
+      synthetic endpoints) do not depend on this. Override on the command line:
+        mvn -Dpgjdbc.version=42.6.0 package   (older, contains synchronized blocks)
+        mvn -Dpgjdbc.version=42.7.4 package   (fixed, uses ReentrantLock - check
+                                                 changelog for the exact version
+                                                 that merged pgjdbc#1951 before
+                                                 relying on this for a paper claim)
+    -->
+    <pgjdbc.version>42.7.4</pgjdbc.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${pgjdbc.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>vt-pinning-app</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${java.version}</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

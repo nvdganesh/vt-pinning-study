@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vtstudy-postgres
+    environment:
+      POSTGRES_DB: vtstudy
+      POSTGRES_USER: vtstudy
+      POSTGRES_PASSWORD: vtstudy
+    ports:
+      - "5432:5432"
+    # Keep this container on the SAME machine as the app under test, not a
+    # separate host -- network latency to the DB is a variable you are not
+    # trying to study here, so minimize and hold it constant.
+    command: ["postgres", "-c", "max_connections=300"]
